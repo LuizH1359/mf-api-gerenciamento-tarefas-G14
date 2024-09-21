@@ -1,0 +1,6 @@
+@mf_api_gerenciamento_tarefas_G14_HostAddress = http://localhost:5287
+
+GET {{mf_api_gerenciamento_tarefas_G14_HostAddress}}/weatherforecast/
+Accept: application/json
+
+###
