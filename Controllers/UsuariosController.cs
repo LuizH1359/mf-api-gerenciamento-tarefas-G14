@@ -32,7 +32,7 @@ namespace mf_api_gerenciamento_tarefas_G14.Controllers
             {
                 Nome = model.Nome,
                 Email = model.Email,
-                Password = model.Password
+                Senha = model.Senha
 
             };
 

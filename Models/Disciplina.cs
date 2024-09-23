@@ -6,14 +6,12 @@ namespace mf_api_gerenciamento_tarefas_G14.Models
     [Table("Disciplinas")]
     public class Disciplina : BaseEntity
     {
-        [Required]
+        [Required(ErrorMessage ="É necessário selecionar uma disciplina.")]
         public DisciplinasEnum Nome { get; set; }
 
-        [Required]
+        [Required(ErrorMessage ="É necessário selecionar o usuário.")]
 
         public int UsuarioId { get; set; }
-
-        [Required]
 
         public Usuario Usuario { get; set; }
 
