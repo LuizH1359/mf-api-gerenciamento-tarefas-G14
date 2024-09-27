@@ -30,5 +30,7 @@ namespace mf_api_gerenciamento_tarefas_G14.Models
     }
 }
 
-
+//ignorar acento, maiusculo ou minusculo 
+//entidade separada e rota separada também
+// melhorar os relacionamentos com disciplina
 // armazenar resposta em um enum e depois na hora de selecionar utilizar
