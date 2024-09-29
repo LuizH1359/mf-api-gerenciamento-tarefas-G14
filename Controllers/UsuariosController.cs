@@ -10,7 +10,7 @@ using System.Text;
 
 namespace mf_api_gerenciamento_tarefas_G14.Controllers
 {
-    [Authorize]
+   // [Authorize]
     [Route("api/[controller]")]
     [ApiController]
     public class UsuariosController : ControllerBase
