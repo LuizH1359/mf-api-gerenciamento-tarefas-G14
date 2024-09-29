@@ -29,20 +29,26 @@ namespace mf_api_gerenciamento_tarefas_G14.Controllers
         }
 
         [HttpPost]
-        public async Task<ActionResult> Create(Nota model)
+        public async Task<ActionResult> Create(NotasDto model)
         {
-            if (ModelState.IsValid)
+            if (!ModelState.IsValid)
             {
                 return BadRequest(ModelState);
             }
 
+            var nota = new Nota
             {
-                _context.Notas.Add(model);
-                await _context.SaveChangesAsync();
+                Valor = model.Valor,
+                DisciplinaId = model.DisciplinaId,
+                UsuarioId = model.UsuarioId
+            };
 
-                return CreatedAtAction("GetById", new { id = model.Id }, model);
-            }
+            _context.Notas.Add(nota);
+            await _context.SaveChangesAsync();
+
+            return CreatedAtAction("GetById", new { id = nota.Id }, nota);
         }
+
 
         [HttpGet("{id}")]
         public async Task<ActionResult> GetById(int id)
@@ -56,9 +62,9 @@ namespace mf_api_gerenciamento_tarefas_G14.Controllers
         }
 
         [HttpPut("{id}")]
-        public async Task<ActionResult> Update(int id, Nota model)
+        public async Task<ActionResult> Update(int id, NotasDto dto)
         {
-            if (id != model.Id) return BadRequest();
+            if (id != dto.Id) return BadRequest();
 
             if (ModelState.IsValid)
             {
@@ -72,7 +78,15 @@ namespace mf_api_gerenciamento_tarefas_G14.Controllers
 
             if (modeloDb == null) return NotFound();
 
-            _context.Notas.Update(model);
+            var nota = new Nota
+            {
+                Id = id,
+                Valor = dto.Valor,
+                DisciplinaId = dto.DisciplinaId,
+                UsuarioId = dto.UsuarioId
+            };
+
+            _context.Notas.Update(nota);
             await _context.SaveChangesAsync();
 
             return NoContent();

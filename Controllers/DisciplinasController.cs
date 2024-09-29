@@ -6,7 +6,7 @@ using Microsoft.EntityFrameworkCore;
 
 namespace mf_api_gerenciamento_tarefas_G14.Controllers
 {
-    [Authorize]
+    //[Authorize]
     [Route("api/[controller]")]
     [ApiController]
     public class DisciplinasController : ControllerBase
@@ -29,13 +29,20 @@ namespace mf_api_gerenciamento_tarefas_G14.Controllers
         }
 
         [HttpPost]
-        public async Task<ActionResult> Create(Disciplina model)
+        public async Task<IActionResult> CreateDisciplina(DisciplinasDto disciplinasDto)
         {
-            _context.Disciplinas.Add(model);
+            var disciplina = new Disciplina
+            {
+                Nome = disciplinasDto.Nome,
+                UsuarioId = disciplinasDto.UsuarioId
+            };
+
+            _context.Disciplinas.Add(disciplina);
             await _context.SaveChangesAsync();
 
-            return CreatedAtAction("GetById", new { id = model.Id }, model);
+            return CreatedAtAction("GetDisciplina", new { id = disciplina.Id }, disciplina);
         }
+
 
         [HttpGet("{id}")]
         public async Task<ActionResult> GetById(int id)
@@ -49,20 +56,32 @@ namespace mf_api_gerenciamento_tarefas_G14.Controllers
         }
 
         [HttpPut("{id}")]
-        public async Task<ActionResult> Update(int id, Disciplina model)
+        public async Task<ActionResult> Update(int id, DisciplinasDto dto)
         {
-            if (id != model.Id) return BadRequest();
+           
+            if (id != dto.Id) return BadRequest("O ID informado não corresponde ao da disciplina.");
 
-            var modeloDb = _context.Disciplinas.AsNoTracking()
-                .FirstOrDefaultAsync(c => c.Id == id);
+           
+            var modeloDb = await _context.Disciplinas.AsNoTracking().FirstOrDefaultAsync(c => c.Id == id);
+
 
             if (modeloDb == null) return NotFound();
 
-            _context.Disciplinas.Update(model);
+   
+            var disciplina = new Disciplina
+            {
+                Id = id,
+                Nome = dto.Nome,
+                UsuarioId = dto.UsuarioId 
+            };
+
+            
+            _context.Disciplinas.Update(disciplina);
             await _context.SaveChangesAsync();
 
             return NoContent();
         }
+
 
         [HttpDelete("{id}")]
         public async Task<ActionResult> Delete(int id)
