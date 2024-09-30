@@ -3,6 +3,7 @@ using System.ComponentModel.DataAnnotations.Schema;
 using System.Collections.Generic;
 using System.Globalization;
 using System.Text;
+using System.Text.Json.Serialization;
 
 namespace mf_api_gerenciamento_tarefas_G14.Models
 {
@@ -16,7 +17,7 @@ namespace mf_api_gerenciamento_tarefas_G14.Models
         public int UsuarioId { get; set; }
 
         public Usuario Usuario { get; set; }
-
+       
         public ICollection<Nota> Notas { get; set; }
 
         public Disciplina()

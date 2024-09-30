@@ -1,5 +1,6 @@
 ﻿using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
+using System.Text.Json.Serialization;
 using mf_api_gerenciamento_tarefas_G14.Models;
 
 
@@ -21,9 +22,13 @@ namespace mf_api_gerenciamento_tarefas_G14.Models
 
         [Required(ErrorMessage ="É necessário informar a senha.")]
         [MinLength(8,ErrorMessage ="A senha não pode conter menos de 8 caracteres.")]
-        public string Senha { get; set; } 
+        public string Senha { get; set; }
 
-      public ICollection<Disciplina> Disciplinas { get; set; }
+        [JsonIgnore]
+        public ICollection<Disciplina> Disciplinas { get; set; }
 
     }
 }
+
+
+//esconder a senha
