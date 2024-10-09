@@ -6,7 +6,7 @@ using Microsoft.EntityFrameworkCore;
 
 namespace mf_api_gerenciamento_tarefas_G14.Controllers
 {
-    [Authorize]
+    //[Authorize]
     [Route("api/[controller]")]
     [ApiController]
     public class DisciplinasController : ControllerBase
@@ -29,19 +29,29 @@ namespace mf_api_gerenciamento_tarefas_G14.Controllers
         }
 
         [HttpPost]
-        public async Task<IActionResult> CreateDisciplina(DisciplinasDto disciplinasDto)
+        public IActionResult CriarDisciplina( DisciplinasDto disciplinaDto)
         {
+            if (!ModelState.IsValid)
+                return BadRequest(ModelState);
+
             var disciplina = new Disciplina
             {
-                Nome = disciplinasDto.Nome,
-                UsuarioId = disciplinasDto.UsuarioId
+                Nome = disciplinaDto.Nome,
+                UsuarioId = disciplinaDto.UsuarioId
             };
 
-            _context.Disciplinas.Add(disciplina);
-            await _context.SaveChangesAsync();
+            var usuario = _context.Usuarios.Find(disciplinaDto.UsuarioId);
+            if (usuario == null)
+            {
+                return NotFound("Usuário não encontrado.");
+            }
 
-            return CreatedAtAction("GetDisciplina", new { id = disciplina.Id }, disciplina);
+            _context.Disciplinas.Add(disciplina);
+            _context.SaveChanges();
+
+            return StatusCode(201, disciplina);
         }
+
 
 
         [HttpGet("{id}")]

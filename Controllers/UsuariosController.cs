@@ -10,7 +10,7 @@ using System.Text;
 
 namespace mf_api_gerenciamento_tarefas_G14.Controllers
 {
-    [Authorize]
+    //[Authorize]
     [Route("api/[controller]")]
     [ApiController]
     public class UsuariosController : ControllerBase
@@ -72,6 +72,8 @@ namespace mf_api_gerenciamento_tarefas_G14.Controllers
             if (modeloDb == null) return NotFound();
 
             modeloDb.Nome = model.Nome;
+            modeloDb.Email = model.Email;
+            modeloDb.Senha = model.Senha;
             _context.Usuarios.Update(modeloDb);
             await _context.SaveChangesAsync();
             return NoContent();
