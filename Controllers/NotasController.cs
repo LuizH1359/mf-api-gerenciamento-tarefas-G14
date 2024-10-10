@@ -8,7 +8,7 @@ using System.Reflection.Metadata.Ecma335;
 
 namespace mf_api_gerenciamento_tarefas_G14.Controllers
 {
-    [Authorize]
+    //[Authorize]
     [Route("api/[controller]")]
     [ApiController]
     public class NotasController : ControllerBase
@@ -64,33 +64,32 @@ namespace mf_api_gerenciamento_tarefas_G14.Controllers
         [HttpPut("{id}")]
         public async Task<ActionResult> Update(int id, NotasDto dto)
         {
-            if (id != dto.Id) return BadRequest();
+            // Verifica se o ID do corpo da requisição corresponde ao ID da URL
+            if (id != dto.Id) return BadRequest("ID da URL não corresponde ao ID da requisição.");
 
-            if (ModelState.IsValid)
+            // Verifica se o ModelState é válido
+            if (!ModelState.IsValid)
             {
-
                 return BadRequest(ModelState);
-
             }
 
-            var modeloDb = await _context.Notas.AsNoTracking()
-                .FirstOrDefaultAsync(c => c.Id == id);
+            // Busca a entidade no banco de dados
+            var notaDb = await _context.Notas.FindAsync(id);
 
-            if (modeloDb == null) return NotFound();
+            if (notaDb == null) return NotFound("Nota não encontrada.");
 
-            var nota = new Nota
-            {
-                Id = id,
-                Valor = dto.Valor,
-                DisciplinaId = dto.DisciplinaId,
-                UsuarioId = dto.UsuarioId
-            };
+            // Atualiza apenas as propriedades necessárias
+            notaDb.Valor = dto.Valor;
+            notaDb.DisciplinaId = dto.DisciplinaId;
+            notaDb.UsuarioId = dto.UsuarioId;
 
-            _context.Notas.Update(nota);
+            // Salva as mudanças no banco de dados
+            _context.Notas.Update(notaDb);
             await _context.SaveChangesAsync();
 
-            return NoContent();
+            return NoContent(); // Retorna 204 (No Content) indicando sucesso
         }
+
         [HttpDelete("{id}")]
         public async Task<ActionResult> Delete(int id)
         {
