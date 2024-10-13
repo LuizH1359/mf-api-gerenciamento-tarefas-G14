@@ -23,8 +23,27 @@ namespace mf_api_gerenciamento_tarefas_G14.Controllers
         [HttpGet]
         public async Task<ActionResult> GetAll()
         {
-            var model = await _context.Disciplinas.Include(t => t.Usuario)
-                .Include(t => t.Notas).ToListAsync();
+            var model = await _context.Disciplinas
+                .Include(u => u.Usuario)
+                .Include(n => n.Notas)
+                .Select(d => new
+                {
+                    d.Id,
+                    d.Nome,
+                    Usuario = new
+                    {
+                        d.Usuario.Id,
+                        d.Usuario.Nome,
+                        d.Usuario.Email
+                    },
+                    Notas = d.Notas.Select(n => new
+                    {
+                        n.Id,
+                        n.Valor,
+                        DisciplinaNome = n.Disciplina.Nome
+                    })
+                })
+                .ToListAsync();
             return Ok(model);
 
         }
@@ -59,11 +78,47 @@ namespace mf_api_gerenciamento_tarefas_G14.Controllers
         public async Task<ActionResult> GetById(int id)
         {
             var model = await _context.Disciplinas
+                .Where(x => x.Id == id)
+                .Select(d => new
+                {
+                    d.Id,
+                    d.Nome,
+                    Usuario = new
+                    {
+                        d.UsuarioId,
+                        d.Usuario.Nome
+                    },
+                    Notas = d.Notas.Select(n => new
+                    {
+                        n.Id,
+                        n.Valor
+                    })
+                })
                 .FirstOrDefaultAsync(c => c.Id == id);
 
             if (model == null) NotFound();
 
             return Ok(model);
+        }
+
+        [HttpGet("{usuarioId}/notas-disciplina/{disciplinaId}")]
+        public async Task<ActionResult> GetNotasByDisciplina(int usuarioId, int disciplinaId)
+        {
+            var notas = await _context.Notas
+                .Where(n => n.UsuarioId == usuarioId && n.DisciplinaId == disciplinaId)
+                .Select(n => new
+                {
+                    n.Id,
+                    n.Valor,
+                    Disciplina = n.Disciplina.Nome,
+                    Usuario = n.Usuario.Nome
+                })
+                .ToListAsync();
+
+            if (!notas.Any())
+                return NotFound("Nenhuma nota encontrada para este usuário nesta disciplina.");
+
+            return Ok(notas);
         }
 
         [HttpPut("{id}")]
@@ -90,7 +145,20 @@ namespace mf_api_gerenciamento_tarefas_G14.Controllers
             _context.Disciplinas.Update(disciplina);
             await _context.SaveChangesAsync();
 
-            return NoContent();
+            var resultado = await _context.Disciplinas
+                .Where(d  => d.Id == id)
+                .Select(d => new
+                {
+                    d.Id,
+                    d.Nome,
+                    Usuario = new
+                    {
+                        d.Usuario.Id,
+                        d.Usuario.Nome
+                    }
+                } ).FirstOrDefaultAsync();
+
+            return Ok(resultado);
         }
 
 
@@ -157,11 +225,9 @@ namespace mf_api_gerenciamento_tarefas_G14.Controllers
              : $"Reprovado com média {media:F2}.";
 
             return Ok(resultado);
-
-
-
-
         }
+
+
     }
 }
 
