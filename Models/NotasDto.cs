@@ -14,6 +14,7 @@ namespace mf_api_gerenciamento_tarefas_G14.Models
         [Required(ErrorMessage = "A disciplina é obrigatória.")]
         public int DisciplinaId { get; set; }
 
+
         [Required(ErrorMessage = "É necessário informar o ID do usuário.")]
         public int UsuarioId { get; set; }
     }

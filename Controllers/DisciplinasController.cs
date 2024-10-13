@@ -23,13 +23,14 @@ namespace mf_api_gerenciamento_tarefas_G14.Controllers
         [HttpGet]
         public async Task<ActionResult> GetAll()
         {
-            var model = await _context.Disciplinas.ToListAsync();
+            var model = await _context.Disciplinas.Include(t => t.Usuario)
+                .Include(t => t.Notas).ToListAsync();
             return Ok(model);
 
         }
 
         [HttpPost]
-        public IActionResult CriarDisciplina( DisciplinasDto disciplinaDto)
+        public IActionResult CriarDisciplina(DisciplinasDto disciplinaDto)
         {
             if (!ModelState.IsValid)
                 return BadRequest(ModelState);
@@ -68,24 +69,24 @@ namespace mf_api_gerenciamento_tarefas_G14.Controllers
         [HttpPut("{id}")]
         public async Task<ActionResult> Update(int id, DisciplinasDto dto)
         {
-           
+
             if (id != dto.Id) return BadRequest("O ID informado não corresponde ao da disciplina.");
 
-           
+
             var modeloDb = await _context.Disciplinas.AsNoTracking().FirstOrDefaultAsync(c => c.Id == id);
 
 
             if (modeloDb == null) return NotFound();
 
-   
+
             var disciplina = new Disciplina
             {
                 Id = id,
                 Nome = dto.Nome,
-                UsuarioId = dto.UsuarioId 
+                UsuarioId = dto.UsuarioId
             };
 
-            
+
             _context.Disciplinas.Update(disciplina);
             await _context.SaveChangesAsync();
 
@@ -106,5 +107,61 @@ namespace mf_api_gerenciamento_tarefas_G14.Controllers
 
         }
 
+
+        [HttpGet("{disciplinaId}/media-notas")]
+        public async Task<ActionResult<decimal>> CalcularMediaNotas(int disciplinaId)
+        {
+            var disciplina = await _context.Disciplinas.FindAsync(disciplinaId);
+            if (disciplina == null)
+            {
+                return NotFound("Disciplina não encontrada.");
+            }
+
+            var notas = await _context.Notas
+                .Where(n => n.DisciplinaId == disciplinaId)
+                .ToListAsync();
+
+            if (notas == null || notas.Count == 0)
+            {
+                return NotFound("Nenhuma nota encontrada para a disciplina.");
+            }
+
+            decimal media = notas.Average(n => n.Valor);
+
+            string mensagemFinal = $"Sua média é {media}";
+
+
+            return Ok(mensagemFinal);
+        }
+
+        [HttpGet("{disciplinaId}/aprovado-reprovado")]
+
+        public async Task<ActionResult<decimal>> InformarStatus(int disciplinaId)
+        {
+            var disciplina = await _context.Disciplinas.FindAsync(disciplinaId);
+            if (disciplina == null)
+                return NotFound("Disciplina não encontrada.");
+
+
+            var notas = await _context.Notas
+                .Where(n => n.DisciplinaId == disciplinaId)
+                .ToListAsync();
+
+            if (notas == null || notas.Count == 0)
+                return NotFound("Nenhuma nota foi encontrada para a disciplina.");
+
+            decimal media = notas.Average(n => n.Valor);
+
+            string resultado = media >= 6
+             ? $"Aprovado com média {media:F2}."
+             : $"Reprovado com média {media:F2}.";
+
+            return Ok(resultado);
+
+
+
+
+        }
     }
 }
+
