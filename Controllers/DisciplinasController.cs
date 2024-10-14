@@ -23,7 +23,8 @@ namespace mf_api_gerenciamento_tarefas_G14.Controllers
         [HttpGet]
         public async Task<ActionResult> GetAll()
         {
-            var model = await _context.Disciplinas
+            var model 
+                = await _context.Disciplinas
                 .Include(u => u.Usuario)
                 .Include(n => n.Notas)
                 .Select(d => new
