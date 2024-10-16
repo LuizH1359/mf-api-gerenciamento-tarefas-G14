@@ -1,7 +1,9 @@
 ﻿using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
 
 namespace mf_api_gerenciamento_tarefas_G14.Models
 {
+    [Table("Tarefas")]
     public class Tarefa : BaseEntity
     {
         [Required]
@@ -13,6 +15,11 @@ namespace mf_api_gerenciamento_tarefas_G14.Models
 
         [Required]
         public bool Realizada { get; set; }
+
+        [Required]
+        public int UsuarioId { get; set; }
+
+        public Usuario Usuario { get; set; }
 
     }
 }

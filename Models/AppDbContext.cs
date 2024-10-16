@@ -26,11 +26,21 @@ namespace mf_api_gerenciamento_tarefas_G14.Models
             .WithOne(n => n.Disciplina)
             .HasForeignKey(n => n.DisciplinaId)
             .OnDelete(DeleteBehavior.Restrict);
+
+            // Relacionamento Usuário / Tarefas (1:N)
+            builder.Entity<Usuario>()
+                .HasMany(u => u.Tarefas)
+                .WithOne(t => t.Usuario)
+                .HasForeignKey(t => t.UsuarioId)
+                .OnDelete(DeleteBehavior.Restrict);
+
         }
 
         public DbSet<Usuario> Usuarios { get; set; }
         public DbSet<Disciplina> Disciplinas { get; set; }
         public DbSet<Nota> Notas { get; set; }
+
+        public DbSet<Tarefa> Tarefas { get; set; }
 
     }
 }
