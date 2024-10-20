@@ -33,5 +33,55 @@ namespace mf_api_gerenciamento_tarefas_G14.Controllers
 
             return Ok(model);
         }
+
+        [HttpPost]
+
+        public async Task<ActionResult> CreateTarefa(Tarefa model)
+        {
+            Tarefa nova = new Tarefa()
+            {
+                Id = model.Id,
+                Nome = model.Nome,
+                Realizada = model.Realizada,
+
+            };
+
+            _context.Tarefas.Add(nova);
+            await _context.SaveChangesAsync();
+
+            return Ok(nova);
+        }
+
+
+        [HttpPut]
+
+        public async Task<ActionResult> Update(int id,Tarefa model)
+        {
+            if (id != model.Id) return BadRequest();
+            var modeloDb = await _context.Tarefas.AsNoTracking().FirstOrDefaultAsync(t =>t.Id == id);
+            if (modeloDb == null) return NotFound();
+
+            modeloDb.Nome = model.Nome;
+            modeloDb.Descricao = model.Descricao;
+            modeloDb.Realizada = model.Realizada;
+
+            _context.Tarefas.Update(modeloDb);
+            await _context.SaveChangesAsync();
+
+            return NoContent();
+
+        }
+
+        [HttpDelete]
+
+        public async Task<ActionResult> Delete(int id)
+        {
+            var model = await _context.Tarefas.FirstOrDefaultAsync(t => t.Id == id);
+            if (model == null) return NotFound();
+            _context.Tarefas.Remove(model);
+            await _context.SaveChangesAsync();
+
+            return NoContent();
+        }
     }
 }

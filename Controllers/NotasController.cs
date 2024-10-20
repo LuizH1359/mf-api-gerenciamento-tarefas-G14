@@ -41,7 +41,7 @@ namespace mf_api_gerenciamento_tarefas_G14.Controllers
         }
 
         [HttpPost]
-        public async Task<ActionResult> Create(NotasDto model)
+        public IActionResult PostarNotas(NotasDto model)
         {
             if (!ModelState.IsValid)
             {
@@ -56,7 +56,7 @@ namespace mf_api_gerenciamento_tarefas_G14.Controllers
             };
 
             _context.Notas.Add(nota);
-            await _context.SaveChangesAsync();
+            _context.SaveChangesAsync();
 
             return CreatedAtAction("GetById", new { id = nota.Id }, nota);
         }

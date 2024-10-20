@@ -8,7 +8,6 @@ namespace mf_api_gerenciamento_tarefas_G14.Models
         public AppDbContext (DbContextOptions options) : base(options) 
         {
 
-
         }
 
         protected override void OnModelCreating(ModelBuilder builder)
@@ -39,7 +38,6 @@ namespace mf_api_gerenciamento_tarefas_G14.Models
         public DbSet<Usuario> Usuarios { get; set; }
         public DbSet<Disciplina> Disciplinas { get; set; }
         public DbSet<Nota> Notas { get; set; }
-
         public DbSet<Tarefa> Tarefas { get; set; }
 
     }
