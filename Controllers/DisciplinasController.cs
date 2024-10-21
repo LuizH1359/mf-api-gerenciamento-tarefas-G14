@@ -231,6 +231,43 @@ namespace mf_api_gerenciamento_tarefas_G14.Controllers
         }
 
 
+
+        [HttpGet("{disciplinaId}/calculo-aprovacao")]
+        public async Task<ActionResult<string>> CalcularAprovacao(int disciplinaId)
+        {
+            
+            var disciplina = await _context.Disciplinas.FindAsync(disciplinaId);
+            if (disciplina == null)
+                return NotFound("Disciplina não encontrada.");
+
+            
+            var notas = await _context.Notas
+                .Where(n => n.DisciplinaId == disciplinaId)
+                .ToListAsync();
+
+            if (notas == null || notas.Count == 0)
+                return NotFound("Nenhuma nota foi encontrada para a disciplina.");
+
+            
+            decimal somaPontuacaoObtida = notas.Sum(n => n.Valor);
+            decimal somaNotaMaxima = notas.Sum(n => n.NotaMaxima);
+
+            if (somaNotaMaxima == 0)
+                return BadRequest("A nota máxima total não pode ser zero.");
+
+           
+            decimal percentualAproveitamento = (somaPontuacaoObtida / somaNotaMaxima) * 100;
+
+           
+            string resultado = percentualAproveitamento >= disciplina.MediaAprovacao
+                ? $"Aprovado com {percentualAproveitamento:F2}% de aproveitamento."
+                : $"Reprovado com {percentualAproveitamento:F2}% de aproveitamento.";
+
+            return Ok(resultado);
+        }
+
+
+
     }
 }
 

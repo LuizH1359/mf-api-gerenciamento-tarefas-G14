@@ -47,6 +47,7 @@ namespace mf_api_gerenciamento_tarefas_G14.Controllers
             var nota = new Nota
             {
                 Valor = notasDto.Valor,
+                NotaMaxima = notasDto.NotaMaxima,
                 DisciplinaId = notasDto.DisciplinaId,
                 UsuarioId = notasDto.UsuarioId,
             };
