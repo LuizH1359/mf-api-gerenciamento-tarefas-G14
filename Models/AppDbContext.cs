@@ -32,7 +32,11 @@ namespace mf_api_gerenciamento_tarefas_G14.Models
                 .WithOne(t => t.Usuario)
                 .HasForeignKey(t => t.UsuarioId)
                 .OnDelete(DeleteBehavior.Restrict);
-
+            // Relacionamento Disciplina / Usuário
+            builder.Entity<Disciplina>()
+            .HasOne(d => d.Usuario)
+            .WithMany(u => u.Disciplinas)
+            .HasForeignKey(d => d.UsuarioId);
         }
 
         public DbSet<Usuario> Usuarios { get; set; }

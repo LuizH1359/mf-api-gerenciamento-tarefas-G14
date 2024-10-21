@@ -58,7 +58,9 @@ namespace mf_api_gerenciamento_tarefas_G14.Controllers
             var disciplina = new Disciplina
             {
                 Nome = disciplinaDto.Nome,
-                UsuarioId = disciplinaDto.UsuarioId
+                UsuarioId = disciplinaDto.UsuarioId,
+                PorcentagemNecessaria = disciplinaDto.PorcentagemNecessaria,
+                Media = 0
             };
 
             var usuario = _context.Usuarios.Find(disciplinaDto.UsuarioId);
@@ -72,6 +74,8 @@ namespace mf_api_gerenciamento_tarefas_G14.Controllers
 
             return StatusCode(201, disciplina);
         }
+
+        
 
 
 
@@ -177,58 +181,56 @@ namespace mf_api_gerenciamento_tarefas_G14.Controllers
         }
 
 
-        [HttpGet("{disciplinaId}/media-notas")]
-        public async Task<ActionResult<decimal>> CalcularMediaNotas(int disciplinaId)
+        [HttpGet("{disciplinaId}/calcular-media/{usuarioId}")]
+        public async Task<ActionResult> CalcularMedia(int disciplinaId, int usuarioId)
         {
-            var disciplina = await _context.Disciplinas.FindAsync(disciplinaId);
-            if (disciplina == null)
+            if (usuarioId <= 0)
             {
-                return NotFound("Disciplina não encontrada.");
+                return BadRequest("ID do usuário é obrigatório.");
             }
 
-            var notas = await _context.Notas
-                .Where(n => n.DisciplinaId == disciplinaId)
-                .ToListAsync();
+            var disciplina = await _context.Disciplinas
+                .Include(d => d.Notas)
+                .Include(d => d.Usuario)
+                .FirstOrDefaultAsync(d => d.Id == disciplinaId);
 
-            if (notas == null || notas.Count == 0)
+            if (disciplina == null) return NotFound("Disciplina não encontrada.");
+
+            if (!disciplina.Notas.Any())
+                return BadRequest("Não há notas registradas para calcular a média.");
+
+            decimal totalNotas = 0;
+            decimal totalMaximas = 0;
+
+            foreach (var nota in disciplina.Notas)
             {
-                return NotFound("Nenhuma nota encontrada para a disciplina.");
+                totalNotas += nota.Valor;
+                totalMaximas += nota.NotaMaxima;
             }
 
-            decimal media = notas.Average(n => n.Valor);
+            
+            if (totalMaximas == 0)
+            {
+                return BadRequest("Não é possível calcular a média, pois a soma das notas máximas é zero.");
+            }
 
-            string mensagemFinal = $"Sua média é {media}";
+            var media = totalNotas / totalMaximas * 100;
+            var mediaNecessaria = disciplina.PorcentagemNecessaria;
+            var aprovado = media >= mediaNecessaria;
 
-
-            return Ok(mensagemFinal);
+            return Ok(new
+            {
+                Media = media,
+                Status = aprovado ? "Aprovado" : "Reprovado",
+                Usuario = new
+                {
+                    disciplina.Usuario.Id,
+                    disciplina.Usuario.Nome,
+                    disciplina.Usuario.Email
+                }
+            });
         }
-
-        [HttpGet("{disciplinaId}/aprovado-reprovado")]
-
-        public async Task<ActionResult<decimal>> InformarStatus(int disciplinaId)
-        {
-            var disciplina = await _context.Disciplinas.FindAsync(disciplinaId);
-            if (disciplina == null)
-                return NotFound("Disciplina não encontrada.");
-
-
-            var notas = await _context.Notas
-                .Where(n => n.DisciplinaId == disciplinaId)
-                .ToListAsync();
-
-            if (notas == null || notas.Count == 0)
-                return NotFound("Nenhuma nota foi encontrada para a disciplina.");
-
-            decimal media = notas.Average(n => n.Valor);
-
-            string resultado = media >= 6
-             ? $"Aprovado com média {media:F2}."
-             : $"Reprovado com média {media:F2}.";
-
-            return Ok(resultado);
-        }
-
-
     }
-}
+    }
+
 
