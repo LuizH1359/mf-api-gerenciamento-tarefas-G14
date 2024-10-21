@@ -2,6 +2,7 @@
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using mf_api_gerenciamento_tarefas_G14.Models;
 
@@ -10,9 +11,11 @@ using mf_api_gerenciamento_tarefas_G14.Models;
 namespace mf_api_gerenciamento_tarefas_G14.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    partial class AppDbContextModelSnapshot : ModelSnapshot
+    [Migration("20241021180255_CorrecoesTarefas")]
+    partial class CorrecoesTarefas
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -29,15 +32,9 @@ namespace mf_api_gerenciamento_tarefas_G14.Migrations
 
                     MySqlPropertyBuilderExtensions.UseMySqlIdentityColumn(b.Property<int>("Id"));
 
-                    b.Property<decimal>("MediaAprovacao")
-                        .HasColumnType("decimal(5, 2)");
-
                     b.Property<string>("Nome")
                         .IsRequired()
                         .HasColumnType("longtext");
-
-                    b.Property<decimal>("NotaMaxima")
-                        .HasColumnType("decimal(5, 2)");
 
                     b.Property<int>("UsuarioId")
                         .HasColumnType("int");

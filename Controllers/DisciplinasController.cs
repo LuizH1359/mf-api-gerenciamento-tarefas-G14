@@ -45,6 +45,7 @@ namespace mf_api_gerenciamento_tarefas_G14.Controllers
                     })
                 })
                 .ToListAsync();
+            
             return Ok(model);
 
         }
@@ -58,7 +59,8 @@ namespace mf_api_gerenciamento_tarefas_G14.Controllers
             var disciplina = new Disciplina
             {
                 Nome = disciplinaDto.Nome,
-                UsuarioId = disciplinaDto.UsuarioId
+                UsuarioId = disciplinaDto.UsuarioId,
+                MediaAprovacao = disciplinaDto.MediaAprovacao,
             };
 
             var usuario = _context.Usuarios.Find(disciplinaDto.UsuarioId);

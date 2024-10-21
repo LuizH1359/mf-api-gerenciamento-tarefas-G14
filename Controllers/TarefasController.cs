@@ -36,34 +36,36 @@ namespace mf_api_gerenciamento_tarefas_G14.Controllers
 
         [HttpPost]
 
-        public async Task<ActionResult> CreateTarefa(Tarefa model)
+        public async Task<ActionResult> CreateTarefa(TarefasDto tarefasDto)
         {
             Tarefa nova = new Tarefa()
             {
-                Id = model.Id,
-                Nome = model.Nome,
-                Realizada = model.Realizada,
+                Id = tarefasDto.Id,
+                Nome = tarefasDto.Nome,
+                Descricao = tarefasDto.Descricao,
+                Realizada = tarefasDto.Realizada,
+                UsuarioId = tarefasDto.UsuarioId,
 
             };
 
             _context.Tarefas.Add(nova);
             await _context.SaveChangesAsync();
 
-            return Ok(nova);
+            return StatusCode(201, nova);
         }
 
 
         [HttpPut]
 
-        public async Task<ActionResult> Update(int id,Tarefa model)
+        public async Task<ActionResult> Update(int id,TarefasDto tarefasDto)
         {
-            if (id != model.Id) return BadRequest();
+            if (id != tarefasDto.Id) return BadRequest();
             var modeloDb = await _context.Tarefas.AsNoTracking().FirstOrDefaultAsync(t =>t.Id == id);
             if (modeloDb == null) return NotFound();
 
-            modeloDb.Nome = model.Nome;
-            modeloDb.Descricao = model.Descricao;
-            modeloDb.Realizada = model.Realizada;
+            modeloDb.Nome = tarefasDto.Nome;
+            modeloDb.Descricao = tarefasDto.Descricao;
+            modeloDb.Realizada = tarefasDto.Realizada;
 
             _context.Tarefas.Update(modeloDb);
             await _context.SaveChangesAsync();

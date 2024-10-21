@@ -13,6 +13,10 @@ namespace mf_api_gerenciamento_tarefas_G14.Models
         [Required(ErrorMessage = "É necessário selecionar uma disciplina.")]
         public string Nome { get; set; }
 
+        [Required(ErrorMessage = "É necessário apontar o valor da média de aprovação")]
+        [Column(TypeName = "decimal(5, 2)")]
+        public int MediaAprovacao { get; set; }
+
         [Required(ErrorMessage = "É necessário selecionar o usuário.")]
         public int UsuarioId { get; set; }
 
@@ -23,11 +27,4 @@ namespace mf_api_gerenciamento_tarefas_G14.Models
 
     }
 }
-//<<<<<<< EndpointsDisciplina
 
-
-//ignorar acento, maiusculo ou minusculo 
-//entidade separada e rota separada também
-// melhorar os relacionamentos com disciplina
-// armazenar resposta em um enum e depois na hora de selecionar utilizar
-//>>>>>>> master
