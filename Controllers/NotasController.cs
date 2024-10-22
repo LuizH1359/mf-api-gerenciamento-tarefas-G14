@@ -8,7 +8,7 @@ using System.Reflection.Metadata.Ecma335;
 
 namespace mf_api_gerenciamento_tarefas_G14.Controllers
 {
-    //[Authorize]
+    [Authorize]
     [Route("api/[controller]")]
     [ApiController]
     public class NotasController : ControllerBase
@@ -41,24 +41,22 @@ namespace mf_api_gerenciamento_tarefas_G14.Controllers
         }
 
         [HttpPost]
-        public IActionResult PostarNotas(NotasDto model)
+        public async Task<ActionResult> PostarNotas(NotasDto notasDto)
         {
-            if (!ModelState.IsValid)
-            {
-                return BadRequest(ModelState);
-            }
 
             var nota = new Nota
             {
-                Valor = model.Valor,
-                DisciplinaId = model.DisciplinaId,
-                UsuarioId = model.UsuarioId
+                Valor = notasDto.Valor,
+                NotaMaxima = notasDto.NotaMaxima,
+                DisciplinaId = notasDto.DisciplinaId,
+                UsuarioId = notasDto.UsuarioId,
             };
 
             _context.Notas.Add(nota);
-            _context.SaveChangesAsync();
+            await _context.SaveChangesAsync();
 
-            return CreatedAtAction("GetById", new { id = nota.Id }, nota);
+            return StatusCode(201, nota);
+
         }
 
 

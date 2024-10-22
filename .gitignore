@@ -362,3 +362,22 @@ MigrationBackup/
 # Fody - auto-generated XML schema
 FodyWeavers.xsd
 
+/Migrations/20241010231754_MigracaoInicial.cs
+/Migrations/20241010231754_MigracaoInicial.Designer.cs
+/Migrations/20241016214743_InclusãoTarefas.Designer.cs
+/Migrations/20241020180718_AdicionaPorcentagemNecessaria.cs
+/Migrations/20241016214743_InclusãoTarefas.cs
+/Migrations/20241021185820_CorrecoesDisciplina.cs
+/Migrations/20241021185820_CorrecoesDisciplina.Designer.cs
+/appsettings.json
+/Controllers/NotasController.cs
+/Controllers/UsuariosController.cs
+/Migrations/20241019224511_M00.cs
+/Migrations/20241019224511_M00.Designer.cs
+/Migrations/20241020164720_AdicionaAutoIncrementoId.cs
+/Migrations/20241020164720_AdicionaAutoIncrementoId.Designer.cs
+/Migrations/20241020175448_AdicionaMedias.cs
+/Migrations/20241020180718_AdicionaPorcentagemNecessaria.Designer.cs
+/Migrations/20241021180255_CorrecoesTarefas.cs
+/Migrations/20241021180255_CorrecoesTarefas.Designer.cs
+*.cs
