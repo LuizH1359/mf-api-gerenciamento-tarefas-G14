@@ -137,11 +137,12 @@ namespace mf_api_gerenciamento_tarefas_G14.Controllers
             var key = Encoding.ASCII.GetBytes("5s8q9s6gW8d2a69q8e4d5s6a8q9w3a02");
 
             var claims = new ClaimsIdentity(new Claim[]
-            {
-        new Claim(ClaimTypes.NameIdentifier, usuario.Id.ToString()),
-        new Claim(ClaimTypes.Email, usuario.Email),
-        new Claim(ClaimTypes.Name, usuario.Nome)
-            });
+ {
+    new Claim(ClaimTypes.NameIdentifier, usuario.Id.ToString()),
+    new Claim(ClaimTypes.Email, usuario.Email),
+    new Claim(ClaimTypes.Name, usuario.Nome),
+    new Claim(JwtRegisteredClaimNames.Iss, "https://localhost:7062")
+ });
 
             var tokenDescriptor = new SecurityTokenDescriptor
             {
