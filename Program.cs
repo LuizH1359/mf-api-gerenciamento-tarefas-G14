@@ -18,6 +18,16 @@ builder.Services.AddDbContext<AppDbContext>(options =>
     )
 );
 
+// Configuração do CORS para permitir requisições de uma página web local
+builder.Services.AddCors(options =>
+{
+    options.AddPolicy("PermitirOrigemLocal",
+        policy =>
+            policy.WithOrigins("http://localhost:5500", "http://127.0.0.1:5500") // Substitua pela URL do seu front-end
+            .AllowAnyHeader()
+            .AllowAnyMethod());
+});
+
 
 builder.Services.AddAuthentication(options =>
 {
@@ -84,7 +94,8 @@ if (app.Environment.IsDevelopment())
     app.UseSwaggerUI();
 }
 
-app.UseHttpsRedirection();
+//app.UseHttpsRedirection();
+app.UseCors("PermitirOrigemLocal"); // Ativa a política de CORS
 app.UseAuthentication();
 app.UseAuthorization();
 

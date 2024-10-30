@@ -32,6 +32,9 @@ namespace mf_api_gerenciamento_tarefas_G14.Migrations
                     b.Property<decimal>("Media")
                         .HasColumnType("decimal(65,30)");
 
+                    b.Property<decimal>("MediaAprovacao")
+                        .HasColumnType("decimal(5, 2)");
+
                     b.Property<string>("Nome")
                         .IsRequired()
                         .HasColumnType("longtext");
@@ -61,7 +64,7 @@ namespace mf_api_gerenciamento_tarefas_G14.Migrations
                         .HasColumnType("int");
 
                     b.Property<decimal>("NotaMaxima")
-                        .HasColumnType("decimal(65,30)");
+                        .HasColumnType("decimal(5, 2)");
 
                     b.Property<int>("UsuarioId")
                         .HasColumnType("int");
