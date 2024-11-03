@@ -23,6 +23,23 @@ namespace mf_api_gerenciamento_tarefas_G14.Controllers
             _context = context;
 
         }
+        [HttpPut("criptografar-senhas")]
+        public async Task<ActionResult> CriptografarSenhas()
+        {
+            var usuarios = await _context.Usuarios.ToListAsync();
+
+            foreach (var usuario in usuarios)
+            {
+                if (!usuario.Senha.StartsWith("$2a$"))
+                {
+                    usuario.Senha = BCrypt.Net.BCrypt.HashPassword(usuario.Senha);
+                }
+            }
+
+            await _context.SaveChangesAsync();
+
+            return Ok("Senhas atualizadas com sucesso.");
+        }
 
         [HttpGet]
         public async Task<ActionResult> GetAll()
@@ -34,20 +51,25 @@ namespace mf_api_gerenciamento_tarefas_G14.Controllers
         [HttpPost]
         public async Task<ActionResult> Create(Usuario model)
         {
+            if (await _context.Usuarios.AnyAsync(u => u.Email == model.Email))
+            {
+                return BadRequest("Este e-mail já está em uso.");
+            }
+
             Usuario novo = new Usuario()
             {
                 Nome = model.Nome,
                 Email = model.Email,
-                Senha = model.Senha
-
+                Senha = BCrypt.Net.BCrypt.HashPassword(model.Senha)
             };
 
             _context.Usuarios.Add(novo);
+
             await _context.SaveChangesAsync();
 
             return CreatedAtAction("GetById", new { id = novo.Id }, novo);
-
         }
+
 
         [HttpGet("{id}")]
         public async Task<ActionResult> GetById(int id)
@@ -95,38 +117,46 @@ namespace mf_api_gerenciamento_tarefas_G14.Controllers
 
         [AllowAnonymous]
         [HttpPost("authenticate")]
-
         public async Task<ActionResult> Authenticate(AuthenticateDto model)
         {
-            var usuarioDb = await _context.Usuarios.FindAsync(model.Id);
+            var usuarioDb = await _context.Usuarios.SingleOrDefaultAsync(u => u.Email == model.Email);
 
-            if (usuarioDb == null || !BCrypt.Net.BCrypt.Verify(model.Senha, usuarioDb.Senha)) return Unauthorized();
+            if (usuarioDb == null || !BCrypt.Net.BCrypt.Verify(model.Senha, usuarioDb.Senha))
+            {
+                return Unauthorized("Usuário ou senha inválidos.");
+            }
 
-            var jwt = "xxxx";
+            var jwt = GenerateJwtToken(usuarioDb);
 
             return Ok(new { jwtToken = jwt });
         }
 
-        private string GenerateJwtToken(Usuario model)
+        private string GenerateJwtToken(Usuario usuario)
         {
             var tokenHandler = new JwtSecurityTokenHandler();
             var key = Encoding.ASCII.GetBytes("5s8q9s6gW8d2a69q8e4d5s6a8q9w3a02");
+
             var claims = new ClaimsIdentity(new Claim[]
-            {
-                new Claim(ClaimTypes.NameIdentifier, model.Id.ToString()),
-                
-            });
+ {
+    new Claim(ClaimTypes.NameIdentifier, usuario.Id.ToString()),
+    new Claim(ClaimTypes.Email, usuario.Email),
+    new Claim(ClaimTypes.Name, usuario.Nome),
+    new Claim(JwtRegisteredClaimNames.Iss, "https://localhost:7062")
+ });
 
             var tokenDescriptor = new SecurityTokenDescriptor
             {
                 Subject = claims,
                 Expires = DateTime.UtcNow.AddHours(8),
-                SigningCredentials = new SigningCredentials(new SymmetricSecurityKey(key),
-                SecurityAlgorithms.HmacSha256Signature)
+                SigningCredentials = new SigningCredentials(
+                    new SymmetricSecurityKey(key),
+                    SecurityAlgorithms.HmacSha256Signature)
             };
 
             var token = tokenHandler.CreateToken(tokenDescriptor);
             return tokenHandler.WriteToken(token);
         }
+
+
     }
 }

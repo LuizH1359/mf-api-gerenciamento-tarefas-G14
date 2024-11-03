@@ -8,7 +8,6 @@ namespace mf_api_gerenciamento_tarefas_G14.Models
         public AppDbContext (DbContextOptions options) : base(options) 
         {
 
-
         }
 
         protected override void OnModelCreating(ModelBuilder builder)
@@ -26,11 +25,24 @@ namespace mf_api_gerenciamento_tarefas_G14.Models
             .WithOne(n => n.Disciplina)
             .HasForeignKey(n => n.DisciplinaId)
             .OnDelete(DeleteBehavior.Restrict);
+
+            // Relacionamento Usuário / Tarefas (1:N)
+            builder.Entity<Usuario>()
+                .HasMany(u => u.Tarefas)
+                .WithOne(t => t.Usuario)
+                .HasForeignKey(t => t.UsuarioId)
+                .OnDelete(DeleteBehavior.Restrict);
+            // Relacionamento Disciplina / Usuário
+            builder.Entity<Disciplina>()
+            .HasOne(d => d.Usuario)
+            .WithMany(u => u.Disciplinas)
+            .HasForeignKey(d => d.UsuarioId);
         }
 
         public DbSet<Usuario> Usuarios { get; set; }
         public DbSet<Disciplina> Disciplinas { get; set; }
         public DbSet<Nota> Notas { get; set; }
+        public DbSet<Tarefa> Tarefas { get; set; }
 
     }
 }

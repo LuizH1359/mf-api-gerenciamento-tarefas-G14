@@ -27,6 +27,9 @@ namespace mf_api_gerenciamento_tarefas_G14.Models
         [JsonIgnore]
         public ICollection<Disciplina> Disciplinas { get; set; }
 
+        [JsonIgnore]
+        public ICollection<Tarefa> Tarefas { get; set; }
+
     }
 }
 

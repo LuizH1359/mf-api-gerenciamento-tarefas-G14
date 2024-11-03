@@ -8,7 +8,7 @@ using System.Reflection.Metadata.Ecma335;
 
 namespace mf_api_gerenciamento_tarefas_G14.Controllers
 {
-    //[Authorize]
+    [Authorize]
     [Route("api/[controller]")]
     [ApiController]
     public class NotasController : ControllerBase
@@ -24,29 +24,39 @@ namespace mf_api_gerenciamento_tarefas_G14.Controllers
         [HttpGet]
         public async Task<ActionResult> GetAll()
         {
-            var model = await _context.Notas.ToListAsync();
+            var model = await _context.Notas
+                .Include(n => n.Usuario)
+                .Include (n => n.Disciplina)
+                .Select(n => new
+                {
+                    n.Id,
+                    n.Valor,
+                    Disciplina = n.Disciplina.Nome,
+                    Usuario = n.Usuario.Nome
+                })
+                .ToListAsync();
             return Ok(model);
+
+
         }
 
         [HttpPost]
-        public async Task<ActionResult> Create(NotasDto model)
+        public async Task<ActionResult> PostarNotas(NotasDto notasDto)
         {
-            if (!ModelState.IsValid)
-            {
-                return BadRequest(ModelState);
-            }
 
             var nota = new Nota
             {
-                Valor = model.Valor,
-                DisciplinaId = model.DisciplinaId,
-                UsuarioId = model.UsuarioId
+                Valor = notasDto.Valor,
+                NotaMaxima = notasDto.NotaMaxima,
+                DisciplinaId = notasDto.DisciplinaId,
+                UsuarioId = notasDto.UsuarioId,
             };
 
             _context.Notas.Add(nota);
             await _context.SaveChangesAsync();
 
-            return CreatedAtAction("GetById", new { id = nota.Id }, nota);
+            return StatusCode(201, nota);
+
         }
 
 
@@ -54,7 +64,16 @@ namespace mf_api_gerenciamento_tarefas_G14.Controllers
         public async Task<ActionResult> GetById(int id)
         {
             var model = await _context.Notas
-                .FirstOrDefaultAsync(c => c.Id == id);
+                .Include(n => n.Usuario) 
+                .Include(n => n.Disciplina)
+                .Select(n => new 
+                {
+                    n.Id,
+                    n.Valor,
+                    Disciplina = n.Disciplina.Nome,
+                    Usuario = n.Usuario.Nome
+                })
+                .FirstOrDefaultAsync(n => n.Id == id);
 
             if (model == null) return NotFound();
 
@@ -64,30 +83,26 @@ namespace mf_api_gerenciamento_tarefas_G14.Controllers
         [HttpPut("{id}")]
         public async Task<ActionResult> Update(int id, NotasDto dto)
         {
-            // Verifica se o ID do corpo da requisição corresponde ao ID da URL
+          
             if (id != dto.Id) return BadRequest("ID da URL não corresponde ao ID da requisição.");
 
-            // Verifica se o ModelState é válido
             if (!ModelState.IsValid)
             {
                 return BadRequest(ModelState);
             }
 
-            // Busca a entidade no banco de dados
             var notaDb = await _context.Notas.FindAsync(id);
 
             if (notaDb == null) return NotFound("Nota não encontrada.");
 
-            // Atualiza apenas as propriedades necessárias
             notaDb.Valor = dto.Valor;
             notaDb.DisciplinaId = dto.DisciplinaId;
             notaDb.UsuarioId = dto.UsuarioId;
 
-            // Salva as mudanças no banco de dados
             _context.Notas.Update(notaDb);
             await _context.SaveChangesAsync();
 
-            return NoContent(); // Retorna 204 (No Content) indicando sucesso
+            return NoContent();
         }
 
         [HttpDelete("{id}")]

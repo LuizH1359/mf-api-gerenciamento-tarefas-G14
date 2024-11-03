@@ -29,9 +29,18 @@ namespace mf_api_gerenciamento_tarefas_G14.Migrations
 
                     MySqlPropertyBuilderExtensions.UseMySqlIdentityColumn(b.Property<int>("Id"));
 
+                    b.Property<decimal>("Media")
+                        .HasColumnType("decimal(65,30)");
+
+                    b.Property<decimal>("MediaAprovacao")
+                        .HasColumnType("decimal(5, 2)");
+
                     b.Property<string>("Nome")
                         .IsRequired()
                         .HasColumnType("longtext");
+
+                    b.Property<decimal>("PorcentagemNecessaria")
+                        .HasColumnType("decimal(65,30)");
 
                     b.Property<int>("UsuarioId")
                         .HasColumnType("int");
@@ -54,11 +63,14 @@ namespace mf_api_gerenciamento_tarefas_G14.Migrations
                     b.Property<int>("DisciplinaId")
                         .HasColumnType("int");
 
+                    b.Property<decimal>("NotaMaxima")
+                        .HasColumnType("decimal(5, 2)");
+
                     b.Property<int>("UsuarioId")
                         .HasColumnType("int");
 
                     b.Property<decimal>("Valor")
-                        .HasColumnType("decimal(5, 2)");
+                        .HasColumnType("decimal(65,30)");
 
                     b.HasKey("Id");
 
@@ -67,6 +79,35 @@ namespace mf_api_gerenciamento_tarefas_G14.Migrations
                     b.HasIndex("UsuarioId");
 
                     b.ToTable("Notas");
+                });
+
+            modelBuilder.Entity("mf_api_gerenciamento_tarefas_G14.Models.Tarefa", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    MySqlPropertyBuilderExtensions.UseMySqlIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<string>("Descricao")
+                        .IsRequired()
+                        .HasColumnType("longtext");
+
+                    b.Property<string>("Nome")
+                        .IsRequired()
+                        .HasColumnType("longtext");
+
+                    b.Property<bool>("Realizada")
+                        .HasColumnType("tinyint(1)");
+
+                    b.Property<int>("UsuarioId")
+                        .HasColumnType("int");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("UsuarioId");
+
+                    b.ToTable("Tarefas");
                 });
 
             modelBuilder.Entity("mf_api_gerenciamento_tarefas_G14.Models.Usuario", b =>
@@ -126,6 +167,17 @@ namespace mf_api_gerenciamento_tarefas_G14.Migrations
                     b.Navigation("Usuario");
                 });
 
+            modelBuilder.Entity("mf_api_gerenciamento_tarefas_G14.Models.Tarefa", b =>
+                {
+                    b.HasOne("mf_api_gerenciamento_tarefas_G14.Models.Usuario", "Usuario")
+                        .WithMany("Tarefas")
+                        .HasForeignKey("UsuarioId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.Navigation("Usuario");
+                });
+
             modelBuilder.Entity("mf_api_gerenciamento_tarefas_G14.Models.Disciplina", b =>
                 {
                     b.Navigation("Notas");
@@ -134,6 +186,8 @@ namespace mf_api_gerenciamento_tarefas_G14.Migrations
             modelBuilder.Entity("mf_api_gerenciamento_tarefas_G14.Models.Usuario", b =>
                 {
                     b.Navigation("Disciplinas");
+
+                    b.Navigation("Tarefas");
                 });
 #pragma warning restore 612, 618
         }
