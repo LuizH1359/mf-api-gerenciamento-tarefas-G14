@@ -49,6 +49,7 @@ namespace mf_api_gerenciamento_tarefas_G14.Controllers
         }
 
         [HttpPost]
+        [AllowAnonymous]
         public async Task<ActionResult> Create(Usuario model)
         {
             if (await _context.Usuarios.AnyAsync(u => u.Email == model.Email))
